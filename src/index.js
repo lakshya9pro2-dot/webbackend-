@@ -96,6 +96,10 @@ function formatDuration(ms) {
 //  CONFIGURATION & CLOUDFLARE KV HELPERS
 // ══════════════════════════════════════════════════════════════
 
+function getKv(env) {
+  return env.KINFLEX_KV || env.website || null;
+}
+
 function getAdminPassword(env) {
   return env.ADMIN_PASSWORD || '9310081539';
 }
@@ -105,11 +109,18 @@ function getTmdbKey(env) {
 }
 
 async function getPlayerApiKey(env) {
-  if (env.KINFLEX_KV) {
-    const val = await env.KINFLEX_KV.get('player_api_key');
+  const kv = getKv(env);
+  if (kv) {
+    const val = await kv.get('player_api_key');
     if (val && val.trim().length > 0) {
       return val.trim();
     }
+    // Auto-seed default player key into KV
+    const defaultKey = env.DEFAULT_PLAYER_API_KEY || 'kine_live_9AuUd4Y1uqQ-GGACHQGNBIxn2E4oxm7H';
+    try {
+      await kv.put('player_api_key', defaultKey);
+    } catch (e) {}
+    return defaultKey;
   }
   return env.DEFAULT_PLAYER_API_KEY || 'kine_live_9AuUd4Y1uqQ-GGACHQGNBIxn2E4oxm7H';
 }
@@ -117,16 +128,18 @@ async function getPlayerApiKey(env) {
 async function setPlayerApiKey(env, newKey) {
   const trimmed = (newKey || '').trim();
   if (!trimmed) throw new Error('API key cannot be empty');
-  if (env.KINFLEX_KV) {
-    await env.KINFLEX_KV.put('player_api_key', trimmed);
+  const kv = getKv(env);
+  if (kv) {
+    await kv.put('player_api_key', trimmed);
     return { success: true, storage: 'cloudflare_kv' };
   }
   return { success: true, storage: 'fallback_memory' };
 }
 
 async function getDataJson(env) {
-  if (env.KINFLEX_KV) {
-    const val = await env.KINFLEX_KV.get('data.json');
+  const kv = getKv(env);
+  if (kv) {
+    const val = await kv.get('data.json');
     if (val) {
       try {
         return JSON.parse(val);
@@ -134,25 +147,39 @@ async function getDataJson(env) {
         console.error('Error parsing data.json from KV:', err);
       }
     }
+    // Auto-seed initial data.json into KV on first run
+    try {
+      await kv.put('data.json', JSON.stringify(DEFAULT_DATA, null, 2));
+    } catch (e) {
+      console.warn('Auto-seed data.json to KV failed:', e);
+    }
   }
   return DEFAULT_DATA;
 }
 
 async function getDataJsonString(env) {
-  if (env.KINFLEX_KV) {
-    const val = await env.KINFLEX_KV.get('data.json');
+  const kv = getKv(env);
+  if (kv) {
+    const val = await kv.get('data.json');
     if (val) return val;
+    // Auto-seed initial data.json into KV
+    const defaultStr = JSON.stringify(DEFAULT_DATA, null, 2);
+    try {
+      await kv.put('data.json', defaultStr);
+    } catch (e) {}
+    return defaultStr;
   }
   return JSON.stringify(DEFAULT_DATA, null, 2);
 }
 
 async function saveDataJsonString(env, content) {
   JSON.parse(content); // Ensure valid JSON
-  if (env.KINFLEX_KV) {
-    await env.KINFLEX_KV.put('data.json', content);
+  const kv = getKv(env);
+  if (kv) {
+    await kv.put('data.json', content);
     return { success: true, storage: 'cloudflare_kv' };
   }
-  return { success: true, storage: 'fallback_memory', warning: 'KINFLEX_KV not bound; persistent storage requires KV binding' };
+  return { success: true, storage: 'fallback_memory', warning: 'KV namespace not bound; persistent storage requires KV binding' };
 }
 
 function checkAdminAuth(request, env) {
@@ -881,12 +908,29 @@ export default {
         // Get Player Settings & API Key
         if (pathname === '/api/admin/settings' && method === 'GET') {
           const playerApiKey = await getPlayerApiKey(env);
+          const kv = getKv(env);
           return jsonResponse({
             success: true,
             playerApiKey,
             playerApiKeyEncoded: btoa(playerApiKey),
-            hasKv: !!env.KINFLEX_KV,
-            storage: env.KINFLEX_KV ? 'cloudflare_kv' : 'fallback_memory',
+            hasKv: !!kv,
+            storage: kv ? 'cloudflare_kv' : 'fallback_memory',
+          });
+        }
+
+        // Force Seed data.json and player key to KV
+        if (pathname === '/api/admin/seed') {
+          const kv = getKv(env);
+          if (!kv) {
+            return errorResponse('Cloudflare KV namespace is not bound.', 400);
+          }
+          await kv.put('data.json', JSON.stringify(DEFAULT_DATA, null, 2));
+          await kv.put('player_api_key', env.DEFAULT_PLAYER_API_KEY || 'kine_live_9AuUd4Y1uqQ-GGACHQGNBIxn2E4oxm7H');
+          return jsonResponse({
+            success: true,
+            message: 'data.json and player_api_key seeded to Cloudflare KV successfully.',
+            namespaceId: '0e5381ad958c42679d3396abe533cb14',
+            namespace: 'website',
           });
         }
 

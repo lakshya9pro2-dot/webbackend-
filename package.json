@@ -7,7 +7,10 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "start": "wrangler dev"
+    "start": "wrangler dev",
+    "kv:upload-data": "wrangler kv:key put --namespace-id=0e5381ad958c42679d3396abe533cb14 \"data.json\" --path=\"./public/data.json\"",
+    "kv:upload-key": "wrangler kv:key put --namespace-id=0e5381ad958c42679d3396abe533cb14 \"player_api_key\" \"kine_live_9AuUd4Y1uqQ-GGACHQGNBIxn2E4oxm7H\"",
+    "kv:upload-all": "npm run kv:upload-data && npm run kv:upload-key"
   },
   "dependencies": {},
   "devDependencies": {

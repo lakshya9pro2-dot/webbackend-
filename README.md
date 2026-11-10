@@ -4,6 +4,41 @@ A high-performance streaming backend migrated from Express to **Cloudflare Worke
 
 ---
 
+## 🗄️ Cloudflare KV Configuration
+
+Your Cloudflare KV namespace is configured as:
+* **Namespace Name:** `website`
+* **Namespace ID:** `0e5381ad958c42679d3396abe533cb14`
+* **Worker Binding:** `KINFLEX_KV` (and `website`)
+
+### Uploading / Seeding Data to KV
+
+You can populate your KV storage using any of these 3 methods:
+
+#### Method 1: Automatic Seeding (Easiest)
+The worker has **auto-seeding built in**. As soon as you deploy or run the worker, it automatically populates `data.json` and your default player key (`kine_live_9AuUd4Y1uqQ-GGACHQGNBIxn2E4oxm7H`) into your KV namespace if it is empty!
+
+#### Method 2: Via Wrangler CLI (One Command)
+Run:
+```bash
+npm run kv:upload-all
+```
+Or upload individually:
+```bash
+# Upload data.json
+npm run kv:upload-data
+
+# Upload player API key
+npm run kv:upload-key
+```
+
+#### Method 3: Via Admin Dashboard
+1. Open `https://<your-worker-domain>/admin` in your browser.
+2. Enter password `9310081539`.
+3. Click **"Save API Key to Cloudflare KV"** or save `data.json` directly.
+
+---
+
 ## 🚀 Key Improvements & Updates
 
 1. **Cloudflare Worker Runtime:**
@@ -12,8 +47,7 @@ A high-performance streaming backend migrated from Express to **Cloudflare Worke
    - Global CORS headers enabled on all endpoints.
 
 2. **Cloudflare KV Storage for `data.json`:**
-   - Media collections, hero movies, logos, and categories are stored directly in Cloudflare KV (`KINFLEX_KV`).
-   - If not yet initialized in KV, it automatically falls back to the bundled catalog (`src/defaultData.js`).
+   - Media collections, hero movies, logos, and categories are stored directly in Cloudflare KV.
    - Instant live updates across all global edge locations when saved from the Admin Dashboard.
 
 3. **New Streaming Player Integration (`player.kineflex.site`):**
@@ -31,38 +65,18 @@ A high-performance streaming backend migrated from Express to **Cloudflare Worke
 
 ## 🛠️ Deployment Instructions
 
-### Step 1: Install Dependencies
+### Step 1: Install Dependencies & Login
 ```bash
 npm install
+npx wrangler login
 ```
 
-### Step 2: Create Cloudflare KV Namespace
-Run the following command to create your production KV namespace:
+### Step 2: Upload to Cloudflare KV
 ```bash
-npx wrangler kv:namespace create KINFLEX_KV
-```
-You will get an output like:
-```
-[[kv_namespaces]]
-binding = "KINFLEX_KV"
-id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+npm run kv:upload-all
 ```
 
-Also create a preview namespace for local development (optional):
-```bash
-npx wrangler kv:namespace create KINFLEX_KV --preview
-```
-
-### Step 3: Update `wrangler.toml`
-Paste the generated `id` and `preview_id` into [`wrangler.toml`](./wrangler.toml):
-```toml
-[[kv_namespaces]]
-binding = "KINFLEX_KV"
-id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-preview_id = "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
-```
-
-### Step 4: Test Locally
+### Step 3: Test Locally
 ```bash
 npm run dev
 ```
@@ -71,7 +85,7 @@ Open [http://localhost:8787](http://localhost:8787) in your browser:
 - Admin Dashboard: `http://localhost:8787/admin`
 - Data Catalog: `http://localhost:8787/data.json`
 
-### Step 5: Deploy to Cloudflare Workers
+### Step 4: Deploy to Cloudflare Workers
 ```bash
 npm run deploy
 ```
@@ -97,6 +111,7 @@ Your worker will be live globally at:
 | `/api/admin/files` | `GET` | Lists editable files (`['data.json']`). |
 | `/api/admin/file` | `GET / POST` | Reads / writes `data.json` to Cloudflare KV (requires `X-Admin-Password`). |
 | `/api/admin/settings` | `GET / POST` | Reads / writes Player API Key to Cloudflare KV (requires `X-Admin-Password`). |
+| `/api/admin/seed` | `POST` | Forces re-seeding of `data.json` and player key to KV. |
 
 ---
 
@@ -110,8 +125,7 @@ Your worker will be live globally at:
 
 ## 🌐 Connecting Your Frontend
 
-In your frontend application (`index.html`, `detail.html`, etc.), update `API_BASE`:
+In your website frontend files (e.g. `index.html`, `detail.html`), update `API_BASE`:
 ```javascript
 const API_BASE = 'https://kinflex-backend.<your-subdomain>.workers.dev';
 ```
-All frontend calls (`/api/play`, `/api/search`, `/api/details`, `/data.json`) will immediately use your new Cloudflare Worker.

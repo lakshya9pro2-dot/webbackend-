@@ -1,0 +1,16 @@
+{
+  "name": "kinflex-backend",
+  "version": "2.0.0",
+  "description": "Kineflex streaming backend on Cloudflare Workers and Cloudflare KV",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "start": "wrangler dev"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "wrangler": "^3.111.0"
+  }
+}

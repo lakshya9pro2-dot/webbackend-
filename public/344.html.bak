@@ -1,0 +1,1925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KineflixTv Admin Dashboard</title>
+  <link rel="icon" href="https://vids.st/storage/thumbs/thumb-90593-1781927771.png">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --bg-base: #06050b;
+      --bg-surface: rgba(22, 19, 35, 0.55);
+      --bg-panel: rgba(13, 11, 22, 0.9);
+      --border-glow: rgba(232, 160, 32, 0.15);
+      --primary: #e8a020;
+      --primary-hover: #f3b139;
+      --primary-glow: rgba(232, 160, 32, 0.3);
+      --secondary: #a855f7;
+      --secondary-glow: rgba(168, 85, 247, 0.2);
+      --danger: #ef4444;
+      --danger-hover: #f87171;
+      --success: #10b981;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --font-outfit: 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-base);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(168, 85, 247, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(232, 160, 32, 0.06) 0%, transparent 40%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      font-family: var(--font-outfit);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
+    }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(6, 5, 11, 0.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .header-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 1.35rem;
+      font-weight: 900;
+    }
+    .logo .logo-yupp, .logo .logo-scope {
+      background: var(--primary);
+      color: #000;
+      padding: 3px 8px;
+    }
+    .logo .logo-yupp {
+      border-radius: 4px 0 0 4px;
+    }
+    .logo .logo-scope {
+      border-radius: 0 4px 4px 0;
+    }
+    .logo .logo-tv {
+      background: #fff;
+      color: #000;
+      padding: 3px 8px;
+    }
+    .badge-admin {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      background: var(--secondary-glow);
+      color: #c084fc;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-weight: 700;
+      margin-left: 8px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #000;
+      font-weight: 700;
+      box-shadow: 0 4px 12px var(--primary-glow);
+      cursor: pointer;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      border-color: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px var(--primary-glow);
+    }
+
+    /* Layout structure */
+    .dashboard-layout {
+      flex: 1;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      gap: 1.5rem;
+      padding: 1.5rem;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 320px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .card-panel {
+      background: var(--bg-surface);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 1.25rem;
+    }
+    .sidebar-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      font-weight: 700;
+    }
+
+    /* File List Buttons */
+    .file-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      color: var(--text-main);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+    }
+    .file-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    .file-item.active {
+      background: rgba(232, 160, 32, 0.08);
+      border-color: rgba(232, 160, 32, 0.3);
+      box-shadow: inset 0 0 12px rgba(232, 160, 32, 0.05);
+    }
+    .file-info-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .file-icon {
+      color: var(--primary);
+    }
+    .file-item.active .file-icon {
+      animation: pulse-glow 2s infinite;
+    }
+    .file-meta-tag {
+      font-size: 0.75rem;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--text-muted);
+    }
+    .file-item.active .file-meta-tag {
+      background: rgba(232, 160, 32, 0.2);
+      color: var(--primary);
+    }
+
+    /* File Metadata Stats */
+    .stat-list {
+      display: grid;
+      gap: 10px;
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.875rem;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .stat-row:last-child {
+      border: none;
+    }
+    .stat-label {
+      color: var(--text-muted);
+    }
+    .stat-val {
+      font-weight: 600;
+      color: #fff;
+    }
+
+    /* Main Area */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      min-width: 0; /* prevents flex layout clipping */
+    }
+
+    /* Workspace Panel Header */
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .active-file-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Editor Tabs View Switcher */
+    .tab-switcher {
+      display: flex;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-family: var(--font-outfit);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover {
+      color: #fff;
+    }
+    .tab-btn.active {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    /* WORKSPACE VIEWS */
+    .workspace-view {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+    }
+    .workspace-view.active {
+      display: flex;
+    }
+
+    /* RAW CODE TEXT EDITOR */
+    .code-editor-container {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 500px;
+      background: #0d0c15;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .editor-toolbar {
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .toolbar-group {
+      display: flex;
+      gap: 8px;
+    }
+    .tool-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tool-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .validator-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    .validator-status.valid {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    .validator-status.invalid {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .editor-body-wrapper {
+      position: relative;
+      flex: 1;
+      display: flex;
+    }
+    .editor-textarea {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      min-height: 480px;
+      background: transparent;
+      border: none;
+      color: #e2e8f0;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      padding: 20px;
+      resize: none;
+      outline: none;
+      tab-size: 2;
+    }
+
+    /* VISUAL GUI EDITOR */
+    .gui-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .search-box {
+      flex: 1;
+      min-width: 250px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 8px 14px;
+      transition: all 0.2s;
+    }
+    .search-box:focus-within {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: var(--primary);
+      box-shadow: 0 0 10px rgba(232, 160, 32, 0.1);
+    }
+    .search-box input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-family: var(--font-outfit);
+      font-size: 0.9rem;
+    }
+    .search-box input::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* Sub-section tab selections for data.json (Hero movies, latest, etc.) */
+    .section-selector-container {
+      overflow-x: auto;
+      margin-bottom: 1rem;
+      padding-bottom: 4px;
+    }
+    .section-tabs {
+      display: flex;
+      gap: 8px;
+      width: max-content;
+    }
+    .section-tab-btn {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .section-tab-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+    }
+    .section-tab-btn.active {
+      background: var(--secondary-glow);
+      border-color: rgba(168, 85, 247, 0.4);
+      color: #e9d5ff;
+      font-weight: 700;
+    }
+
+    /* Item Cards Grid */
+    .items-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(1, 1fr);
+    }
+    @media (min-width: 768px) {
+      .items-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (min-width: 1200px) {
+      .items-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .item-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.2s;
+    }
+    .item-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+    .item-card-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      background: rgba(0, 0, 0, 0.15);
+    }
+    .item-card-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      line-height: 1.3;
+      color: #fff;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .item-card-id {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .item-card-body {
+      padding: 16px;
+      flex: 1;
+      display: flex;
+      gap: 14px;
+    }
+    .item-thumb {
+      width: 70px;
+      height: 100px;
+      border-radius: 6px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .item-card-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.8rem;
+      min-width: 0;
+    }
+    .detail-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      color: var(--text-muted);
+    }
+    .detail-row span {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .badge-quality {
+      font-size: 0.65rem;
+      font-weight: 800;
+      background: var(--primary-glow);
+      color: var(--primary);
+      padding: 1px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(232, 160, 32, 0.2);
+    }
+    .badge-media {
+      font-size: 0.65rem;
+      font-weight: 600;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      padding: 1px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .item-card-actions {
+      padding: 12px 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.1);
+    }
+    .card-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .card-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+    .card-btn-edit:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .card-btn-delete:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    /* Modal Form / Popups */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      padding: 1rem;
+    }
+    .modal-overlay.show {
+      display: flex;
+      opacity: 1;
+    }
+    .modal-content {
+      background: var(--bg-panel);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), 0 0 32px var(--border-glow);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(20px);
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .modal-overlay.show .modal-content {
+      transform: translateY(0);
+    }
+    .modal-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #fff;
+    }
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+    .modal-close:hover {
+      color: #fff;
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .form-grid {
+      display: grid;
+      gap: 1.25rem;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-row-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    .form-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .form-input {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #fff;
+      font-family: var(--font-outfit);
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .form-input:focus {
+      border-color: var(--primary);
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 0 8px rgba(232, 160, 32, 0.15);
+    }
+    .form-textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+    .form-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(255,255,255,0.6)' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+      background-position: right 14px center;
+      background-size: 16px;
+      background-repeat: no-repeat;
+      padding-right: 40px;
+    }
+
+    .modal-footer {
+      padding: 1.25rem 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      background: rgba(0, 0, 0, 0.15);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Config Editing Panel for data.json logos */
+    .config-card-grid {
+      display: grid;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Toasts Container */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .toast {
+      background: #110f1e;
+      border: 1px solid var(--primary);
+      color: #fff;
+      padding: 14px 20px;
+      border-radius: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 280px;
+      transform: translateX(120%);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .toast.show {
+      transform: translateX(0);
+    }
+    .toast.success {
+      border-color: var(--success);
+    }
+    .toast.danger {
+      border-color: var(--danger);
+    }
+    .toast-icon {
+      flex-shrink: 0;
+    }
+    .toast.success .toast-icon {
+      color: var(--success);
+    }
+    .toast.danger .toast-icon {
+      color: var(--danger);
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% {
+        opacity: 1;
+        text-shadow: 0 0 8px rgba(232, 160, 32, 0.5);
+      }
+      50% {
+        opacity: 0.7;
+        text-shadow: 0 0 2px rgba(232, 160, 32, 0.2);
+      }
+    }
+
+    /* Empty state display */
+    .empty-state {
+      padding: 60px 20px;
+      text-align: center;
+      color: var(--text-muted);
+      border: 2px dashed rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      margin-top: 1rem;
+    }
+    .empty-state-icon {
+      color: rgba(255, 255, 255, 0.1);
+      margin-bottom: 12px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .dashboard-layout {
+        flex-direction: column;
+        padding: 1rem;
+      }
+      .sidebar {
+        width: 100%;
+      }
+    }
+
+    /* Login Modal Overlay */
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      background: #06050b;
+      background-image: 
+        radial-gradient(circle at 50% 30%, rgba(168, 85, 247, 0.15) 0%, transparent 50%);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .login-card {
+      background: rgba(22, 19, 35, 0.7);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7), 0 0 40px rgba(168, 85, 247, 0.15);
+      text-align: center;
+    }
+    .login-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 900;
+      margin-bottom: 1.5rem;
+    }
+    .login-logo .logo-yupp, .login-logo .logo-scope {
+      background: var(--primary);
+      color: #000;
+      padding: 3px 8px;
+    }
+    .login-logo .logo-yupp {
+      border-radius: 4px 0 0 4px;
+    }
+    .login-logo .logo-scope {
+      border-radius: 0 4px 4px 0;
+    }
+    .login-logo .logo-tv {
+      background: #fff;
+      color: #000;
+      padding: 3px 8px;
+    }
+    .login-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: #fff;
+    }
+    .login-subtitle {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+    .login-error {
+      color: var(--danger);
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN OVERLAY -->
+  <div class="login-overlay" id="login-overlay" style="display: none;">
+    <div class="login-card">
+      <div class="login-logo">
+        <span class="logo-yupp">Kine</span><span class="logo-tv">flix</span><span class="logo-scope">Tv</span>
+      </div>
+      <h3 class="login-title">Admin Authorization</h3>
+      <p class="login-subtitle">Please enter your password to gain access</p>
+      
+      <div class="login-error" id="login-error-msg">
+        <i data-lucide="alert-circle" style="width: 16px; height: 16px;"></i>
+        <span>Invalid password, please try again.</span>
+      </div>
+
+      <form onsubmit="handleLoginSubmit(event)" style="display: flex; flex-direction: column; gap: 1rem;">
+        <div class="form-group" style="text-align: left;">
+          <label class="form-label" for="admin-pwd-input">Password</label>
+          <input type="password" class="form-input" id="admin-pwd-input" required placeholder="Enter admin password..." />
+        </div>
+        <button class="nav-btn btn-primary" type="submit" style="justify-content: center; padding: 12px; cursor: pointer;">
+          <i data-lucide="key" style="width: 18px; height: 18px;"></i>
+          Unlock Dashboard
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-container">
+      <a href="index.html" class="logo-container">
+        <div class="logo">
+          <span class="logo-yupp">Kine</span><span class="logo-tv">flix</span><span class="logo-scope">Tv</span>
+        </div>
+        <span class="badge-admin">Database Admin</span>
+      </a>
+      <div class="header-actions">
+        <a href="index.html" class="nav-btn">
+          <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+          View Client Site
+        </a>
+        <button class="nav-btn" onclick="logoutAdmin()" style="cursor: pointer; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: #f87171;">
+          <i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
+          Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- LAYOUT -->
+  <div class="dashboard-layout">
+    
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      
+      <!-- Files Selector Card -->
+      <div class="card-panel">
+        <h3 class="sidebar-title">Configuration Files</h3>
+        <div class="file-list" id="file-list-container">
+          <button class="file-item active" data-file="data.json" onclick="selectFile('data.json')">
+            <div class="file-info-header">
+              <i data-lucide="file-json" class="file-icon"></i>
+              <span>data.json</span>
+            </div>
+            <span class="file-meta-tag">Metadata</span>
+          </button>
+          <button class="file-item" data-file="video.json" onclick="selectFile('video.json')">
+            <div class="file-info-header">
+              <i data-lucide="file-json" class="file-icon"></i>
+              <span>video.json</span>
+            </div>
+            <span class="file-meta-tag">Streams</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- File Info Stats Card -->
+      <div class="card-panel">
+        <h3 class="sidebar-title">File Statistics</h3>
+        <div class="stat-list">
+          <div class="stat-row">
+            <span class="stat-label">File Size:</span>
+            <span class="stat-val" id="stat-size">Loading…</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Items Count:</span>
+            <span class="stat-val" id="stat-count">Loading…</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Last Saved:</span>
+            <span class="stat-val" id="stat-saved">Loading…</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Help Guidelines Card -->
+      <div class="card-panel">
+        <h3 class="sidebar-title">Editor Guidelines</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px;">
+          Be careful while editing. Raw JSON structures must remain syntactically correct.
+        </p>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+          The system auto-validates syntax. Errors will block saving to prevent backend site failures.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- MAIN EDIT AREA -->
+    <div class="main-content">
+      
+      <!-- Panel Header (File Title + Switcher) -->
+      <div class="panel-header">
+        <div class="active-file-title">
+          <i data-lucide="file-edit" style="color: var(--primary);"></i>
+          <span id="active-file-label">data.json</span>
+        </div>
+
+        <div class="tab-switcher">
+          <button class="tab-btn active" id="tab-gui" onclick="setViewMode('gui')">
+            <i data-lucide="layout-grid" style="width: 16px; height: 16px;"></i>
+            Visual GUI
+          </button>
+          <button class="tab-btn" id="tab-code" onclick="setViewMode('code')">
+            <i data-lucide="code" style="width: 16px; height: 16px;"></i>
+            Raw Text Editor
+          </button>
+        </div>
+      </div>
+
+      <!-- VIEW 1: INTERACTIVE GUI VIEW -->
+      <div class="workspace-view active" id="view-gui">
+        
+        <!-- GUI Actions Toolbar -->
+        <div class="gui-toolbar">
+          <div class="search-box">
+            <i data-lucide="search" style="width: 18px; height: 18px; color: var(--text-muted);"></i>
+            <input type="text" id="gui-search" placeholder="Search items by title..." oninput="handleSearch(this.value)" />
+          </div>
+          <button class="nav-btn btn-primary" onclick="openAddModal()">
+            <i data-lucide="plus-circle" style="width: 18px; height: 18px;"></i>
+            Create New Entry
+          </button>
+        </div>
+
+        <!-- Section selector tabs for data.json lists -->
+        <div class="section-selector-container" id="sections-bar-wrap">
+          <div class="section-tabs" id="sections-tabs-bar">
+            <!-- Dynamically populated sections -->
+          </div>
+        </div>
+
+        <!-- Category configs for logos (specifically for data.json logos) -->
+        <div id="gui-config-logos-section" style="display: none;" class="card-panel">
+          <h3 class="sidebar-title" style="margin-bottom: 12px;">Configuration Logos</h3>
+          <div class="config-card-grid" id="gui-config-logos-grid">
+            <!-- logo inputs -->
+          </div>
+          <button class="nav-btn btn-primary" style="margin-top: 10px;" onclick="saveConfigLogos()">Save Config Logos</button>
+        </div>
+
+        <!-- Items grid container -->
+        <div class="items-grid" id="gui-items-grid">
+          <!-- Dynamic cards -->
+        </div>
+
+        <!-- Empty state placeholder -->
+        <div class="empty-state" id="gui-empty-state" style="display: none;">
+          <i data-lucide="folder-open" class="empty-state-icon" style="width: 48px; height: 48px;"></i>
+          <h3>No items found</h3>
+          <p style="font-size: 0.9rem; margin-top: 4px;">Try modifying your search or click "Create New Entry" to populate elements.</p>
+        </div>
+
+      </div>
+
+      <!-- VIEW 2: RAW TEXT CODE EDITOR VIEW -->
+      <div class="workspace-view" id="view-code">
+        <div class="code-editor-container">
+          
+          <!-- Editor Toolbar -->
+          <div class="editor-toolbar">
+            <div class="toolbar-group">
+              <button class="tool-btn" onclick="formatJSON()" title="Beautify indent formatting">
+                <i data-lucide="align-left" style="width: 14px; height: 14px;"></i>
+                Format JSON
+              </button>
+              <button class="tool-btn" onclick="minifyJSON()" title="Remove spaces and newlines">
+                <i data-lucide="minimize-2" style="width: 14px; height: 14px;"></i>
+                Minify
+              </button>
+              <button class="tool-btn" onclick="copyToClipboard()">
+                <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
+                Copy All
+              </button>
+              <button class="tool-btn" onclick="restoreOriginal()" title="Reload from server">
+                <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
+                Reset
+              </button>
+            </div>
+
+            <!-- Status Indicator -->
+            <div class="validator-status valid" id="editor-validator">
+              <i data-lucide="check" style="width: 16px; height: 16px;"></i>
+              <span>✓ JSON Valid</span>
+            </div>
+
+            <button class="nav-btn btn-primary" onclick="saveRawContent()" id="btn-save-raw">
+              <i data-lucide="save" style="width: 16px; height: 16px;"></i>
+              Save File
+            </button>
+          </div>
+
+          <!-- Code Box -->
+          <div class="editor-body-wrapper">
+            <textarea class="editor-textarea" id="raw-textarea" autocomplete="off" spellcheck="false" placeholder="Enter JSON here..." oninput="handleCodeInput()"></textarea>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- TOASTS NOTIFICATIONS -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ADD / EDIT MODAL FORM -->
+  <div class="modal-overlay" id="item-modal" onclick="if(event.target === this) closeItemModal()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-title-label">Add Entry</h2>
+        <button class="modal-close" onclick="closeItemModal()">
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="modal-item-form" onsubmit="handleFormSubmit(event)">
+          <div class="form-grid" id="modal-form-fields">
+            <!-- Dynamic fields depending on active file / schema -->
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" type="button" onclick="closeItemModal()">Cancel</button>
+        <button class="btn-primary" type="submit" form="modal-item-form">Save Item</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Globals
+    const API_BASE = 'https://kinflexbackend.onrender.com';
+    let activeFile = 'data.json';
+    let viewMode = 'gui';
+    let fileContents = '';     // Raw string from file
+    let parsedData = null;     // Decoded object representation
+    let activeSection = 'heroMovies'; // data.json sub-list
+    let activeEditIndex = -1;  // GUI edit marker
+    let searchQuery = '';
+
+    // Field Schemas
+    const schemas = {
+      'video.json': [
+        { key: 'id', label: 'Movie/TV TMDB ID', type: 'number', required: true, desc: 'TMDB matches this id to load title description and cast.' },
+        { key: 'title', label: 'Fallback Title', type: 'text', required: true },
+        { key: 'play', label: 'Turbovidhls play code (e.g. 6a378c3436228)', type: 'text', required: true },
+        { key: 'playUrl', label: 'Direct Play URL Override', type: 'text', desc: 'Direct stream URL override (.mp4 or .m3u8), overrides play code.' },
+        { key: 'type', label: 'Media Type', type: 'select', options: ['movie', 'tv'], default: 'movie' },
+        { key: 'quality', label: 'Quality Badges', type: 'text', default: 'HD', desc: 'Single string or comma-separated qualities' }
+      ],
+      'data.json': {
+        'heroMovies': [
+          { key: 'id', label: 'TMDB ID', type: 'number', required: true },
+          { key: 'title', label: 'Title', type: 'text', required: true },
+          { key: 'type', label: 'Type', type: 'select', options: ['movie', 'tv'], default: 'movie' },
+          { key: 'year', label: 'Year', type: 'text' },
+          { key: 'duration', label: 'Duration / Seasons Count', type: 'text' },
+          { key: 'quality', label: 'Quality', type: 'text', default: 'HD' },
+          { key: 'thumbnail', label: 'Thumbnail URL', type: 'text' },
+          { key: 'poster', label: 'Poster Banner URL', type: 'text' },
+          { key: 'videoUrl', label: 'Background Video Stream URL', type: 'text' },
+          { key: 'playUrl', label: 'Custom Play link', type: 'text' },
+          { key: 'description', label: 'Short Description Overview', type: 'textarea' }
+        ],
+        'trendingMovies': [
+          { key: 'id', label: 'TMDB ID', type: 'number', required: true },
+          { key: 'title', label: 'Title', type: 'text', required: true },
+          { key: 'type', label: 'Type', type: 'select', options: ['movie', 'tv'], default: 'movie' },
+          { key: 'year', label: 'Year', type: 'text' },
+          { key: 'quality', label: 'Quality', type: 'text', default: 'HD' },
+          { key: 'thumbnail', label: 'Thumbnail Poster URL', type: 'text', required: true }
+        ],
+        'newArrivalsMovies': [
+          { key: 'id', label: 'TMDB ID', type: 'number', required: true },
+          { key: 'title', label: 'Title', type: 'text', required: true },
+          { key: 'type', label: 'Type', type: 'select', options: ['movie', 'tv'], default: 'movie' },
+          { key: 'year', label: 'Year', type: 'text' },
+          { key: 'quality', label: 'Quality', type: 'text', default: 'HD' },
+          { key: 'thumbnail', label: 'Thumbnail / Banner URL', type: 'text', required: true },
+          { key: 'playUrl', label: 'Direct URL / Override Link', type: 'text' }
+        ],
+        'latestMovies': [
+          { key: 'id', label: 'TMDB ID', type: 'number', required: true },
+          { key: 'title', label: 'Title', type: 'text', required: true },
+          { key: 'type', label: 'Type', type: 'select', options: ['movie', 'tv'], default: 'movie' },
+          { key: 'year', label: 'Year', type: 'text' },
+          { key: 'quality', label: 'Quality', type: 'text', default: 'HD' },
+          { key: 'thumbnail', label: 'Thumbnail Poster URL', type: 'text', required: true },
+          { key: 'description', label: 'Description Override', type: 'textarea' }
+        ],
+        'top10Movies': [
+          { key: 'id', label: 'TMDB ID', type: 'number', required: true },
+          { key: 'title', label: 'Title', type: 'text', required: true },
+          { key: 'type', label: 'Type', type: 'select', options: ['movie', 'tv'], default: 'movie' },
+          { key: 'year', label: 'Year', type: 'text' },
+          { key: 'quality', label: 'Quality', type: 'text', default: 'HD' },
+          { key: 'thumbnail', label: 'Thumbnail Poster URL', type: 'text', required: true }
+        ],
+        'popularMovies': [
+          { key: 'id', label: 'TMDB ID', type: 'number', required: true },
+          { key: 'title', label: 'Title', type: 'text', required: true },
+          { key: 'type', label: 'Type', type: 'select', options: ['movie', 'tv'], default: 'movie' },
+          { key: 'year', label: 'Year', type: 'text' },
+          { key: 'quality', label: 'Quality', type: 'text', default: 'HD' },
+          { key: 'thumbnail', label: 'Thumbnail Poster URL', type: 'text', required: true },
+          { key: 'playUrl', label: 'Direct Play URL Override', type: 'text' }
+        ],
+        'actionMovies': [
+          { key: 'id', label: 'TMDB ID', type: 'number', required: true },
+          { key: 'title', label: 'Title', type: 'text', required: true },
+          { key: 'type', label: 'Type', type: 'select', options: ['movie', 'tv'], default: 'movie' },
+          { key: 'year', label: 'Year', type: 'text' },
+          { key: 'quality', label: 'Quality', type: 'text', default: 'HD' },
+          { key: 'thumbnail', label: 'Thumbnail Poster URL', type: 'text', required: true },
+          { key: 'playUrl', label: 'Direct Play URL Override', type: 'text' }
+        ],
+        'webSeries': [
+          { key: 'id', label: 'TMDB ID', type: 'number', required: true },
+          { key: 'title', label: 'Title', type: 'text', required: true },
+          { key: 'type', label: 'Type', type: 'select', options: ['movie', 'tv'], default: 'tv' },
+          { key: 'year', label: 'Year', type: 'text' },
+          { key: 'quality', label: 'Quality', type: 'text', default: 'HD' },
+          { key: 'thumbnail', label: 'Thumbnail Poster URL', type: 'text', required: true },
+          { key: 'playUrl', label: 'Direct Play URL Override', type: 'text' }
+        ],
+        'liveChannels': [
+          { key: 'name', label: 'Channel Name', type: 'text', required: true },
+          { key: 'url', label: 'Stream Stream URL (.m3u8)', type: 'text', required: true },
+          { key: 'logo', label: 'Logo Image URL', type: 'text' },
+          { key: 'category', label: 'Group Category (e.g. News, Movies)', type: 'text' }
+        ]
+      }
+    };
+
+    // Authenticated API request helper
+    async function apiFetch(url, options = {}) {
+      const pwd = localStorage.getItem('admin_password');
+      if (!options.headers) options.headers = {};
+      options.headers['X-Admin-Password'] = pwd || '';
+      
+      const response = await fetch(url, options);
+      if (response.status === 401) {
+        showToast('Session expired or unauthorized. Please log in.', 'danger');
+        logoutAdmin();
+        throw new Error('Unauthorized');
+      }
+      return response;
+    }
+
+    // Load file on launch or trigger login prompt
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuthentication();
+      lucide.createIcons();
+    });
+
+    function checkAuthentication() {
+      const pwd = localStorage.getItem('admin_password');
+      if (!pwd) {
+        showLoginOverlay();
+      } else {
+        verifyAuthAndLoad();
+      }
+    }
+
+    async function verifyAuthAndLoad() {
+      try {
+        const response = await fetch(`${API_BASE}/api/admin/files`, {
+          headers: { 'X-Admin-Password': localStorage.getItem('admin_password') || '' }
+        });
+        
+        if (response.status === 401) {
+          localStorage.removeItem('admin_password');
+          showLoginOverlay();
+        } else {
+          hideLoginOverlay();
+          selectFile(activeFile);
+        }
+      } catch (err) {
+        console.error('Connection error verifying authorization:', err);
+        showToast('Server unreachable. Please verify server status.', 'danger');
+      }
+    }
+
+    function showLoginOverlay() {
+      document.getElementById('login-overlay').style.display = 'flex';
+      document.getElementById('admin-pwd-input').focus();
+    }
+
+    function hideLoginOverlay() {
+      document.getElementById('login-overlay').style.display = 'none';
+      document.getElementById('login-error-msg').style.display = 'none';
+    }
+
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const pwdInput = document.getElementById('admin-pwd-input').value;
+      
+      try {
+        const response = await fetch(`${API_BASE}/api/admin/files`, {
+          headers: { 'X-Admin-Password': pwdInput }
+        });
+        
+        if (response.status === 200) {
+          localStorage.setItem('admin_password', pwdInput);
+          hideLoginOverlay();
+          selectFile(activeFile);
+          showToast('Welcome to KineflixTv Dashboard!');
+        } else {
+          document.getElementById('login-error-msg').style.display = 'flex';
+          document.getElementById('admin-pwd-input').value = '';
+          document.getElementById('admin-pwd-input').focus();
+        }
+      } catch (err) {
+        showToast('Server connection failed.', 'danger');
+      }
+    }
+
+    function logoutAdmin() {
+      localStorage.removeItem('admin_password');
+      showLoginOverlay();
+      showToast('Logged out of admin console.');
+    }
+
+    // Toast alert helper
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      
+      const iconName = type === 'success' ? 'check-circle' : 'alert-circle';
+      toast.innerHTML = `
+        <i data-lucide="${iconName}" class="toast-icon"></i>
+        <span>${message}</span>
+      `;
+      
+      container.appendChild(toast);
+      lucide.createIcons();
+      
+      // Animation entry
+      setTimeout(() => toast.classList.add('show'), 50);
+      
+      // Auto dismiss
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // Switch between files
+    async function selectFile(fileName) {
+      activeFile = fileName;
+      
+      // Update Active classes
+      document.querySelectorAll('.file-item').forEach(item => {
+        if (item.dataset.file === fileName) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+
+      document.getElementById('active-file-label').textContent = fileName;
+      
+      // Hide section bars and visual lists
+      document.getElementById('sections-bar-wrap').style.display = 'none';
+      document.getElementById('gui-config-logos-section').style.display = 'none';
+
+      await fetchFileContent();
+    }
+
+    // Pull contents from backend
+    async function fetchFileContent() {
+      try {
+        const response = await apiFetch(`${API_BASE}/api/admin/file?name=${activeFile}`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          fileContents = data.content;
+          
+          // Populate editor textarea
+          document.getElementById('raw-textarea').value = fileContents;
+          
+          // Validate JSON
+          handleCodeInput();
+
+          // Render GUI visual panel
+          renderGuiLayout();
+          updateFileStatistics();
+        } else {
+          showToast(data.message || 'Failed to read file', 'danger');
+        }
+      } catch (err) {
+        console.error('Failed to load JSON file:', err);
+        if (err.message !== 'Unauthorized') {
+          showToast(`Server unreachable. Make sure backend runs at ${API_BASE}.`, 'danger');
+        }
+      }
+    }
+
+    // Update the statistics details card
+    function updateFileStatistics() {
+      // Calculate file size
+      const bytes = new Blob([fileContents]).size;
+      const sizeKB = (bytes / 1024).toFixed(2) + ' KB';
+      document.getElementById('stat-size').textContent = sizeKB;
+
+      // Calculate items count
+      let itemsCount = 0;
+      if (parsedData) {
+        if (Array.isArray(parsedData)) {
+          itemsCount = parsedData.length;
+        } else {
+          // data.json counts all elements in lists
+          const listKeys = ['heroMovies', 'trendingMovies', 'newArrivalsMovies', 'latestMovies', 'top10Movies', 'popularMovies', 'actionMovies', 'webSeries', 'liveChannels'];
+          listKeys.forEach(k => {
+            if (Array.isArray(parsedData[k])) itemsCount += parsedData[k].length;
+          });
+        }
+      }
+      document.getElementById('stat-count').textContent = itemsCount;
+      
+      // Last modified date/time
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('stat-saved').textContent = timeStr;
+    }
+
+    // Toggle view: GUI vs Raw editor
+    function setViewMode(mode) {
+      viewMode = mode;
+      
+      document.getElementById('tab-gui').classList.toggle('active', mode === 'gui');
+      document.getElementById('tab-code').classList.toggle('active', mode === 'code');
+      
+      document.getElementById('view-gui').classList.toggle('active', mode === 'gui');
+      document.getElementById('view-code').classList.toggle('active', mode === 'code');
+      
+      if (mode === 'gui') {
+        // Build GUI list from the code values
+        try {
+          parsedData = JSON.parse(document.getElementById('raw-textarea').value);
+          renderGuiLayout();
+        } catch (e) {
+          showToast('JSON contains errors. Correct them in raw editor before returning to Visual mode.', 'danger');
+          setViewMode('code');
+        }
+      }
+    }
+
+    // Validate JSON on code modification
+    function handleCodeInput() {
+      const text = document.getElementById('raw-textarea').value;
+      const statusEl = document.getElementById('editor-validator');
+      
+      try {
+        parsedData = JSON.parse(text);
+        
+        statusEl.className = 'validator-status valid';
+        statusEl.innerHTML = `
+          <i data-lucide="check" style="width: 16px; height: 16px;"></i>
+          <span>✓ JSON Valid</span>
+        `;
+        document.getElementById('btn-save-raw').disabled = false;
+      } catch (err) {
+        statusEl.className = 'validator-status invalid';
+        statusEl.innerHTML = `
+          <i data-lucide="x-circle" style="width: 16px; height: 16px;"></i>
+          <span title="${err.message}">✗ JSON Invalid</span>
+        `;
+        document.getElementById('btn-save-raw').disabled = true;
+      }
+      lucide.createIcons();
+    }
+
+    // Format (Beautify) JSON text
+    function formatJSON() {
+      const text = document.getElementById('raw-textarea').value;
+      try {
+        const obj = JSON.parse(text);
+        document.getElementById('raw-textarea').value = JSON.stringify(obj, null, 2);
+        handleCodeInput();
+        showToast('JSON beautified successfully.');
+      } catch (e) {
+        showToast('Invalid JSON structure. Can not format.', 'danger');
+      }
+    }
+
+    // Minify JSON text
+    function minifyJSON() {
+      const text = document.getElementById('raw-textarea').value;
+      try {
+        const obj = JSON.parse(text);
+        document.getElementById('raw-textarea').value = JSON.stringify(obj);
+        handleCodeInput();
+        showToast('JSON minified successfully.');
+      } catch (e) {
+        showToast('Invalid JSON structure. Can not minify.', 'danger');
+      }
+    }
+
+    // Copy editor text to clipboard
+    async function copyToClipboard() {
+      const el = document.getElementById('raw-textarea');
+      try {
+        await navigator.clipboard.writeText(el.value);
+        showToast('Full JSON code copied to clipboard.');
+      } catch (e) {
+        showToast('Failed to copy to clipboard.', 'danger');
+      }
+    }
+
+    // Reset code back to original loaded content
+    function restoreOriginal() {
+      if (confirm('Revert all unsaved text modifications?')) {
+        document.getElementById('raw-textarea').value = fileContents;
+        handleCodeInput();
+        showToast('Reverted modifications.');
+      }
+    }
+
+    // Send Raw content to server
+    async function saveRawContent() {
+      const contentText = document.getElementById('raw-textarea').value;
+      
+      // Parse check
+      try {
+        JSON.parse(contentText);
+      } catch (err) {
+        showToast('Can not save: Invalid JSON structure.', 'danger');
+        return;
+      }
+
+      try {
+        const response = await apiFetch(`${API_BASE}/api/admin/file`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: activeFile, content: contentText })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          fileContents = contentText;
+          showToast(`${activeFile} written successfully.`);
+          updateFileStatistics();
+        } else {
+          showToast(data.message || 'Failed to save', 'danger');
+        }
+      } catch (err) {
+        if (err.message !== 'Unauthorized') {
+          showToast('Server unreachable. Failed to save.', 'danger');
+        }
+      }
+    }
+
+    // Render Visual UI panel list
+    function renderGuiLayout() {
+      const grid = document.getElementById('gui-items-grid');
+      const emptyState = document.getElementById('gui-empty-state');
+      grid.innerHTML = '';
+      emptyState.style.display = 'none';
+
+      if (!parsedData) return;
+
+      if (activeFile === 'video.json') {
+        // video.json is a flat Array
+        if (!Array.isArray(parsedData)) parsedData = [];
+        renderGuiItems(parsedData);
+      } else {
+        // data.json contains sections
+        document.getElementById('sections-bar-wrap').style.display = 'block';
+        renderDataJsonSectionsTabs();
+        
+        // Show logo config block if config selected
+        if (activeSection === 'config') {
+          document.getElementById('gui-config-logos-section').style.display = 'block';
+          renderConfigLogos();
+        } else {
+          document.getElementById('gui-config-logos-section').style.display = 'none';
+          const items = Array.isArray(parsedData[activeSection]) ? parsedData[activeSection] : [];
+          renderGuiItems(items);
+        }
+      }
+    }
+
+    // Load tabs selection for data.json sections
+    function renderDataJsonSectionsTabs() {
+      const container = document.getElementById('sections-tabs-bar');
+      container.innerHTML = '';
+
+      const items = [
+        { key: 'heroMovies', label: 'Hero Slide' },
+        { key: 'trendingMovies', label: 'Trending' },
+        { key: 'newArrivalsMovies', label: 'New Arrivals' },
+        { key: 'latestMovies', label: 'Latest' },
+        { key: 'top10Movies', label: 'Top 10' },
+        { key: 'popularMovies', label: 'Popular' },
+        { key: 'actionMovies', label: 'Action Movies' },
+        { key: 'webSeries', label: 'Web Series' },
+        { key: 'liveChannels', label: 'Live TV' },
+        { key: 'config', label: 'Logos Config' }
+      ];
+
+      items.forEach(sec => {
+        const btn = document.createElement('button');
+        btn.className = `section-tab-btn ${activeSection === sec.key ? 'active' : ''}`;
+        btn.textContent = sec.label;
+        btn.onclick = () => {
+          activeSection = sec.key;
+          renderGuiLayout();
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    // Render Logo configs inputs
+    function renderConfigLogos() {
+      const grid = document.getElementById('gui-config-logos-grid');
+      grid.innerHTML = '';
+
+      if (!parsedData.config) parsedData.config = { logos: {} };
+      if (!parsedData.config.logos) parsedData.config.logos = {};
+
+      const logos = parsedData.config.logos;
+      const keys = ['hotstar', 'zee5', 'sony', 'sun'];
+
+      keys.forEach(k => {
+        const row = document.createElement('div');
+        row.className = 'form-group';
+        row.innerHTML = `
+          <label class="form-label">${k.toUpperCase()} Logo URL</label>
+          <input type="text" class="form-input logo-config-input" data-key="${k}" value="${logos[k] || ''}" placeholder="Enter Logo Image Link..." />
+        `;
+        grid.appendChild(row);
+      });
+    }
+
+    // Save configuration logo updates
+    function saveConfigLogos() {
+      const inputs = document.querySelectorAll('.logo-config-input');
+      inputs.forEach(input => {
+        const key = input.dataset.key;
+        parsedData.config.logos[key] = input.value;
+      });
+
+      // Synchronize editor text content
+      syncGuiToCode();
+      saveRawContent();
+    }
+
+    // Render visual cards
+    function renderGuiItems(itemsList) {
+      const grid = document.getElementById('gui-items-grid');
+      const emptyState = document.getElementById('gui-empty-state');
+      
+      const filtered = itemsList.filter(item => {
+        if (!searchQuery) return true;
+        const titleVal = item.title || item.name || '';
+        return titleVal.toLowerCase().includes(searchQuery.toLowerCase());
+      });
+
+      if (filtered.length === 0) {
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      filtered.forEach((item, index) => {
+        // Resolve target array index
+        const originalIndex = itemsList.indexOf(item);
+
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        
+        const titleStr = item.title || item.name || 'Untitled';
+        const imgUrl = item.thumbnail || item.poster || 'https://via.placeholder.com/150x220/1a1a2e/e8a020?text=No+Photo';
+        
+        let detailsHtml = '';
+        if (activeFile === 'video.json') {
+          detailsHtml = `
+            <div class="detail-row"><i data-lucide="play" style="width: 14px; height: 14px;"></i> <span>Code: ${item.play || 'None'}</span></div>
+            <div class="detail-row"><i data-lucide="link" style="width: 14px; height: 14px;"></i> <span title="${item.playUrl || 'None'}">${item.playUrl ? 'Override Set' : 'No Override URL'}</span></div>
+            <div style="margin-top: 6px; display: flex; gap: 6px;">
+              <span class="badge-media">${item.type || 'movie'}</span>
+              <span class="badge-quality">${item.quality || 'HD'}</span>
+            </div>
+          `;
+        } else if (activeSection === 'liveChannels') {
+          detailsHtml = `
+            <div class="detail-row"><i data-lucide="tv" style="width: 14px; height: 14px;"></i> <span>Category: ${item.category || 'General'}</span></div>
+            <div class="detail-row"><i data-lucide="link" style="width: 14px; height: 14px;"></i> <span title="${item.url || ''}">${item.url || 'No Stream URL'}</span></div>
+          `;
+        } else {
+          detailsHtml = `
+            <div class="detail-row"><i data-lucide="calendar" style="width: 14px; height: 14px;"></i> <span>Year: ${item.year || '—'}</span></div>
+            <div class="detail-row"><i data-lucide="clock" style="width: 14px; height: 14px;"></i> <span>Len: ${item.duration || '—'}</span></div>
+            <div style="margin-top: 6px; display: flex; gap: 6px;">
+              <span class="badge-media">${item.type || 'movie'}</span>
+              <span class="badge-quality">${item.quality || 'HD'}</span>
+            </div>
+          `;
+        }
+
+        const idBadge = item.id ? `<span class="item-card-id">ID: ${item.id}</span>` : '';
+
+        card.innerHTML = `
+          <div class="item-card-header">
+            <h4 class="item-card-title" title="${titleStr}">${titleStr}</h4>
+            ${idBadge}
+          </div>
+          <div class="item-card-body">
+            <img class="item-thumb" src="${imgUrl}" alt="Cover" onerror="this.src='https://via.placeholder.com/150x220/1a1a2e/e8a020?text=No+Photo'" />
+            <div class="item-card-details">
+              ${detailsHtml}
+            </div>
+          </div>
+          <div class="item-card-actions">
+            <button class="card-btn card-btn-edit" onclick="openEditModal(${originalIndex})">
+              <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i>
+              Edit
+            </button>
+            <button class="card-btn card-btn-delete" onclick="deleteItem(${originalIndex})">
+              <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+              Delete
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    // Sync edited GUI state back to textarea code block
+    function syncGuiToCode() {
+      document.getElementById('raw-textarea').value = JSON.stringify(parsedData, null, 2);
+      handleCodeInput();
+    }
+
+    // Search query trigger
+    function handleSearch(val) {
+      searchQuery = val;
+      renderGuiLayout();
+    }
+
+    // MODAL DIALOG CONTROLS
+    function openAddModal() {
+      activeEditIndex = -1;
+      document.getElementById('modal-title-label').textContent = `Add Entry (${activeFile === 'video.json' ? 'video.json' : activeSection})`;
+      buildFormFields({});
+      document.getElementById('item-modal').classList.add('show');
+    }
+
+    function openEditModal(index) {
+      activeEditIndex = index;
+      document.getElementById('modal-title-label').textContent = `Edit Entry`;
+      
+      const itemData = activeFile === 'video.json' ? parsedData[index] : parsedData[activeSection][index];
+      buildFormFields(itemData);
+      document.getElementById('item-modal').classList.add('show');
+    }
+
+    function closeItemModal() {
+      document.getElementById('item-modal').classList.remove('show');
+    }
+
+    // Build Form Inputs depending on File/Section Schema definitions
+    function buildFormFields(currentValues) {
+      const container = document.getElementById('modal-form-fields');
+      container.innerHTML = '';
+
+      const schema = activeFile === 'video.json' ? schemas['video.json'] : schemas['data.json'][activeSection];
+      
+      schema.forEach(field => {
+        const val = currentValues[field.key] !== undefined ? currentValues[field.key] : (field.default || '');
+        const reqAttr = field.required ? 'required' : '';
+        const descHtml = field.desc ? `<p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">${field.desc}</p>` : '';
+
+        const group = document.createElement('div');
+        group.className = 'form-group';
+
+        let inputHtml = '';
+        if (field.type === 'textarea') {
+          inputHtml = `<textarea class="form-input form-textarea" name="${field.key}" ${reqAttr} placeholder="Enter details...">${val}</textarea>`;
+        } else if (field.type === 'select') {
+          const opts = field.options.map(opt => `<option value="${opt}" ${opt === val ? 'selected' : ''}>${opt.toUpperCase()}</option>`).join('');
+          inputHtml = `<select class="form-input form-select" name="${field.key}" ${reqAttr}>${opts}</select>`;
+        } else {
+          // number or text
+          inputHtml = `<input type="${field.type}" class="form-input" name="${field.key}" value="${val}" ${reqAttr} placeholder="Enter value..." />`;
+        }
+
+        group.innerHTML = `
+          <label class="form-label">${field.label} ${field.required ? '<span style="color:var(--danger)">*</span>' : ''}</label>
+          ${inputHtml}
+          ${descHtml}
+        `;
+        container.appendChild(group);
+      });
+    }
+
+    // Save modifications from Form
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(e.target);
+      const updatedItem = {};
+
+      const schema = activeFile === 'video.json' ? schemas['video.json'] : schemas['data.json'][activeSection];
+      
+      schema.forEach(field => {
+        let val = formData.get(field.key);
+        if (field.type === 'number' && val !== '') {
+          val = Number(val);
+        }
+        updatedItem[field.key] = val;
+      });
+
+      // Update source JSON structure
+      if (activeFile === 'video.json') {
+        if (activeEditIndex === -1) {
+          parsedData.push(updatedItem);
+        } else {
+          parsedData[activeEditIndex] = updatedItem;
+        }
+      } else {
+        if (!parsedData[activeSection]) parsedData[activeSection] = [];
+        if (activeEditIndex === -1) {
+          parsedData[activeSection].push(updatedItem);
+        } else {
+          parsedData[activeSection][activeEditIndex] = updatedItem;
+        }
+      }
+
+      // Synchronize changes
+      syncGuiToCode();
+      closeItemModal();
+      saveRawContent(); // write file to server
+      renderGuiLayout(); // reload Visual UI
+    }
+
+    // Delete item card
+    function deleteItem(index) {
+      const itemTitle = activeFile === 'video.json' 
+        ? (parsedData[index].title || 'Untitled') 
+        : (parsedData[activeSection][index].title || parsedData[activeSection][index].name || 'Untitled');
+
+      if (confirm(`Are you sure you want to delete "${itemTitle}"?`)) {
+        if (activeFile === 'video.json') {
+          parsedData.splice(index, 1);
+        } else {
+          parsedData[activeSection].splice(index, 1);
+        }
+        
+        syncGuiToCode();
+        saveRawContent();
+        renderGuiLayout();
+      }
+    }
+  </script>
+</body>
+</html>

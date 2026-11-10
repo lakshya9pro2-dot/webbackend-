@@ -1,0 +1,19 @@
+name = "kinflex-backend"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Environment variables
+[vars]
+DEFAULT_PLAYER_API_KEY = "kine_live_9AuUd4Y1uqQ-GGACHQGNBIxn2E4oxm7H"
+ADMIN_PASSWORD = "9310081539"
+TMDB_KEY = "e6333b32409e02a4a6eba6fb7ff866bb"
+
+# Cloudflare KV Storage Binding for data.json & player_api_key
+# To create your KV namespace, run:
+#   npx wrangler kv:namespace create KINFLEX_KV
+# Then paste your KV id below:
+[[kv_namespaces]]
+binding = "KINFLEX_KV"
+id = "YOUR_KV_NAMESPACE_ID"
+preview_id = "YOUR_PREVIEW_KV_NAMESPACE_ID"
